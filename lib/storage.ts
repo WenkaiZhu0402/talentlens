@@ -1,0 +1,4 @@
+const DB='talentlens-v1';
+async function db():Promise<IDBDatabase>{return new Promise((resolve,reject)=>{const q=indexedDB.open(DB,1);q.onupgradeneeded=()=>q.result.createObjectStore('workspace');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);});}
+export async function readState(){const d=await db();return new Promise<any>((resolve,reject)=>{const t=d.transaction('workspace','readonly');const q=t.objectStore('workspace').get('state');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);t.oncomplete=()=>d.close();});}
+export async function saveState(value:unknown){const d=await db();return new Promise<void>((resolve,reject)=>{const t=d.transaction('workspace','readwrite');t.objectStore('workspace').put(value,'state');t.oncomplete=()=>{d.close();resolve();};t.onerror=()=>{d.close();reject(t.error);};});}
